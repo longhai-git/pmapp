@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日程管理 - PMAPP</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">📅</span>
+                    <span class="logo-text">PMAPP</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-view="home">
+                    <span class="nav-icon">🏠</span>
+                    <span class="nav-text">首页</span>
+                </button>
+                <button class="nav-btn" data-view="new-task">
+                    <span class="nav-icon">➕</span>
+                    <span class="nav-text">新增日程</span>
+                </button>
+                <button class="nav-btn" data-view="schedule">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">日程</span>
+                </button>
+                <button class="nav-btn" data-view="project">
+                    <span class="nav-icon">📁</span>
+                    <span class="nav-text">项目</span>
+                </button>
+                <button class="nav-btn" data-view="inspiration">
+                    <span class="nav-icon">💡</span>
+                    <span class="nav-text">灵感</span>
+                </button>
+                <button class="nav-btn" data-view="archive">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">归档</span>
+                </button>
+                <button class="nav-btn" data-view="timer">
+                    <span class="nav-icon">⏱️</span>
+                    <span class="nav-text">时钟</span>
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="nav-btn" data-view="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">设置</span>
+                </button>
+            </div>
+        </aside>
+
+        <header class="top-bar">
+            <button class="menu-toggle" id="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h1 class="app-title">日程管理</h1>
+            <div class="top-center">
+                <div class="clock" id="clock">00:00:00</div>
+            </div>
+            <div class="top-right">
+                <span class="date-display" id="date-display">今天：周三 6月12日</span>
+                <div class="user-avatar">👤</div>
+            </div>
+        </header>
+
+        <main class="main-content" id="main-content">
+            <div id="view-home" class="view-panel active">
+                <div class="home-layout">
+                    <div class="home-left">
+                        <div class="home-section-card">
+                            <div class="section-header">
+                                <h2 class="section-title">今日重点</h2>
+                                <div class="section-actions">
+                                    <button class="action-icon">👤</button>
+                                    <button class="action-icon">▼</button>
+                                </div>
+                            </div>
+                            <div class="focus-cards" id="focus-cards"></div>
+                        </div>
+                        <div class="reminder-banner" id="reminder-banner" style="display: none;">
+                            <span>⚠️ 有任务已超时，请及时处理</span>
+                            <button class="reminder-btn" onclick="goToSchedule()">查看</button>
+                        </div>
+                    </div>
+                    <div class="home-right">
+                        <div class="home-section-card calendar-card">
+                            <div class="section-header">
+                                <h2 class="section-title" id="calendar-title">周视图</h2>
+                                <div class="view-selector">
+                                    <button class="view-selector-btn" id="view-selector-btn">▼</button>
+                                    <div class="view-selector-menu" id="view-selector-menu">
+                                        <button class="view-option active" data-view="week" onclick="switchHomeCalendar('week')">周视图</button>
+                                        <button class="view-option" data-view="month" onclick="switchHomeCalendar('month')">月视图</button>
+                                        <button class="view-option" data-view="year" onclick="switchHomeCalendar('year')">年视图</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="calendar-content" id="calendar-content">
+                                <div class="week-calendar" id="home-week-calendar"></div>
+                                <div class="month-calendar" id="home-month-calendar"></div>
+                                <div class="year-calendar" id="home-year-calendar"></div>
+                            </div>
+                        </div>
+                        <div class="home-section-card progress-card">
+                            <div class="section-header">
+                                <h2 class="section-title">本周进度</h2>
+                                <button class="action-icon">筛选</button>
+                            </div>
+                            <div class="progress-content">
+                                <div class="progress-ring-wrapper">
+                                    <svg class="progress-ring" width="120" height="120">
+                                        <circle class="progress-ring-bg" cx="60" cy="60" r="50" fill="none" stroke="#4a4a5a" stroke-width="12"></circle>
+                                        <circle class="progress-ring-fill" cx="60" cy="60" r="50" fill="none" stroke="#5b7cfa" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314"></circle>
+                                    </svg>
+                                    <div class="progress-ring-text" id="progress-text">0%</div>
+                                </div>
+                                <div class="progress-stats">
+                                    <div class="progress-stat">
+                                        <div class="stat-dot completed"></div>
+                                        <span class="stat-label">已完成</span>
+                                        <span class="stat-value" id="completed-count">0项</span>
+                                    </div>
+                                    <div class="progress-stat">
+                                        <div class="stat-dot pending"></div>
+                                        <span class="stat-label">待处理</span>
+                                        <span class="stat-value" id="pending-count">0项</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-new-task" class="view-panel">
+                <h2 class="section-title">新增任务</h2>
+                <div class="task-form-container">
+                    <form id="task-form" class="task-form">
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input type="text" id="task-title" required placeholder="输入任务标题">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>日期</label>
+                                <input type="date" id="task-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>开始时间</label>
+                                <input type="time" id="task-start-time" required>
+                            </div>
+                            <div class="form-group">
+                                <label>结束时间</label>
+                                <input type="time" id="task-end-time" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>任务类型</label>
+                                <select id="task-type">
+                                    <option value="main">主任务</option>
+                                    <option value="sub">子任务</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>重复</label>
+                                <select id="task-repeat">
+                                    <option value="none">不重复</option>
+                                    <option value="daily">每天</option>
+                                    <option value="weekly">每周</option>
+                                    <option value="monthly">每月</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>提醒</label>
+                                <select id="task-reminder">
+                                    <option value="none">不提醒</option>
+                                    <option value="5min">提前5分钟</option>
+                                    <option value="15min">提前15分钟</option>
+                                    <option value="30min">提前30分钟</option>
+                                    <option value="1hour">提前1小时</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>归属项目</label>
+                            <input type="text" id="task-project" placeholder="输入项目名称">
+                        </div>
+                        <div class="form-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="task-urgent">
+                                <span>标记紧急</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="task-priority">
+                                <span>标记优先</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea id="task-note" rows="3" placeholder="输入备注信息"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+                            <button type="submit" class="btn-primary">保存任务</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-schedule" class="view-panel">
+                <h2 class="section-title">日程</h2>
+                <div class="schedule-filter-bar">
+                    <div class="search-group">
+                        <input type="text" class="search-input" id="schedule-search" placeholder="搜索任务名称或时间..." oninput="filterSchedule()">
+                    </div>
+                    <div class="filter-group">
+                        <select id="schedule-quick-filter" onchange="applyQuickFilter()">
+                            <option value="all">全部时间</option>
+                            <option value="today">今天</option>
+                            <option value="week">本周</option>
+                            <option value="month">本月</option>
+                            <option value="custom">自定义范围</option>
+                        </select>
+                        <div id="custom-date-range" class="date-range-input" style="display: none;">
+                            <input type="date" id="schedule-date-from" onchange="filterSchedule()">
+                            <span>至</span>
+                            <input type="date" id="schedule-date-to" onchange="filterSchedule()">
+                        </div>
+                    </div>
+                </div>
+                <div class="schedule-list" id="schedule-list"></div>
+            </div>
+
+            <div id="view-project" class="view-panel">
+                <h2 class="section-title">项目视图</h2>
+                <div class="project-container" id="project-container"></div>
+                <button class="add-project-btn" onclick="showAddProjectModal()">+ 新建项目</button>
+            </div>
+
+            <div id="view-inspiration" class="view-panel">
+                <h2 class="section-title">灵感驿站</h2>
+                <button class="add-inspiration-btn" onclick="showInspirationEditor()">+ 记录灵感</button>
+                <div class="inspiration-grid" id="inspiration-grid"></div>
+            </div>
+
+            <div id="view-archive" class="view-panel">
+                <h2 class="section-title">归档</h2>
+                <div class="archive-container">
+                    <div class="archive-section">
+                        <h3 class="archive-title">本周任务</h3>
+                        <div class="archive-list" id="archive-week"></div>
+                    </div>
+                    <div class="archive-section">
+                        <h3 class="archive-title">已完成</h3>
+                        <div class="archive-list" id="archive-completed"></div>
+                    </div>
+                    <div class="archive-section">
+                        <h3 class="archive-title">未完成</h3>
+                        <div class="archive-list" id="archive-uncompleted"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-timer" class="view-panel">
+                <h2 class="section-title">时钟</h2>
+                <div class="timer-content">
+                    <div class="timer-tabs">
+                        <button class="timer-tab active" data-timer="pomodoro">番茄计时</button>
+                        <button class="timer-tab" data-timer="stopwatch">正计时</button>
+                    </div>
+                    <div class="timer-display">
+                        <div class="pomodoro-timer" id="pomodoro-timer">
+                            <div class="pomodoro-options">
+                                <button class="pomodoro-btn" data-time="25">25分</button>
+                                <button class="pomodoro-btn" data-time="15">15分</button>
+                                <button class="pomodoro-btn" data-time="45">45分</button>
+                            </div>
+                            <div class="pomodoro-clock" id="pomodoro-clock">25:00</div>
+                            <div class="pomodoro-controls">
+                                <button class="timer-btn" id="pomodoro-start">开始</button>
+                                <button class="timer-btn" id="pomodoro-pause">暂停</button>
+                                <button class="timer-btn" id="pomodoro-reset">重置</button>
+                            </div>
+                        </div>
+                        <div class="stopwatch-timer" id="stopwatch-timer">
+                            <div class="stopwatch-clock" id="stopwatch-clock">00:00:00</div>
+                            <div class="stopwatch-controls">
+                                <button class="timer-btn" id="stopwatch-start">开始</button>
+                                <button class="timer-btn" id="stopwatch-pause">暂停</button>
+                                <button class="timer-btn" id="stopwatch-reset">重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-settings" class="view-panel">
+                <h2 class="section-title">设置</h2>
+                <div class="settings-container">
+                    <div class="settings-section">
+                        <h3>数据管理</h3>
+                        <button class="btn-primary" onclick="exportData()">导出数据</button>
+                        <label class="file-upload-label">
+                            <span>导入数据</span>
+                            <input type="file" id="import-file" accept=".json" onchange="importData(this)">
+                        </label>
+                    </div>
+                    <div class="settings-section">
+                        <h3>关于</h3>
+                        <p>PMAPP 日程管理 v1.0</p>
+                        <p>简洁轻便的个人日程管理工具</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="modal-overlay" id="modal-overlay"></div>
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">标题</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="scripts/storage.js"></script>
+    <script src="scripts/tasks.js"></script>
+    <script src="scripts/inspiration.js"></script>
+    <script src="scripts/timer.js"></script>
+    <script src="scripts/ui.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+</html>
