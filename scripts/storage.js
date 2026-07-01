@@ -10,27 +10,35 @@ const SUPABASE_CONFIG = {
     anonKey: 'sb_publishable_tIilB2NQHqAc5ObBwTkcKg_9iJfJZm5'
 };
 
-let supabase = null;
-
 function initSupabase() {
-    if (window.Supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-        supabase = window.Supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        return true;
+    try {
+        if (window.Supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            window.pmappSupabase = window.Supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+            return true;
+        }
+    } catch (e) {
+        console.error('Supabase 初始化失败:', e);
     }
     return false;
 }
 
+function getSupabase() {
+    return window.pmappSupabase || null;
+}
+
 function isCloudEnabled() {
-    return supabase !== null;
+    return getSupabase() !== null;
 }
 
 async function getCurrentUser() {
+    const supabase = getSupabase();
     if (!supabase) return null;
     const { data: { user } } = await supabase.auth.getUser();
     return user;
 }
 
 async function signIn(email, password) {
+    const supabase = getSupabase();
     if (!supabase) throw new Error('Supabase 未配置');
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
@@ -38,6 +46,7 @@ async function signIn(email, password) {
 }
 
 async function signUp(email, password) {
+    const supabase = getSupabase();
     if (!supabase) throw new Error('Supabase 未配置');
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
@@ -45,6 +54,7 @@ async function signUp(email, password) {
 }
 
 async function signOut() {
+    const supabase = getSupabase();
     if (!supabase) return;
     await supabase.auth.signOut();
 }
@@ -348,6 +358,7 @@ const Storage = {
     },
 
     async syncTasks() {
+        const supabase = getSupabase();
         if (!supabase) return;
         const user = await getCurrentUser();
         if (!user) return;
@@ -437,6 +448,7 @@ const Storage = {
     },
 
     async syncInspirations() {
+        const supabase = getSupabase();
         if (!supabase) return;
         const user = await getCurrentUser();
         if (!user) return;
@@ -495,6 +507,7 @@ const Storage = {
     },
 
     async syncProjects() {
+        const supabase = getSupabase();
         if (!supabase) return;
         const user = await getCurrentUser();
         if (!user) return;
