@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    initSupabase();
     closeModal();
     Storage.initSampleData();
     
@@ -20,10 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHomeMonthCalendar();
     renderHomeYearCalendar();
     renderWeekProgress();
-    renderMonthView();
-    renderWeekView();
-    renderDayView();
-    renderYearView();
     renderScheduleList();
     renderProjectView();
     renderInspirations();

@@ -13,8 +13,8 @@ const SUPABASE_CONFIG = {
 let supabase = null;
 
 function initSupabase() {
-    if (window.supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-        supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+    if (window.Supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+        supabase = window.Supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
         return true;
     }
     return false;

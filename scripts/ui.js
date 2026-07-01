@@ -45,17 +45,25 @@ function initNavigation() {
         }
     });
     
-    document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
-    document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+    if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => changeMonth(1));
     
-    document.getElementById('prev-week').addEventListener('click', () => changeWeek(-1));
-    document.getElementById('next-week').addEventListener('click', () => changeWeek(1));
+    const prevWeekBtn = document.getElementById('prev-week');
+    const nextWeekBtn = document.getElementById('next-week');
+    if (prevWeekBtn) prevWeekBtn.addEventListener('click', () => changeWeek(-1));
+    if (nextWeekBtn) nextWeekBtn.addEventListener('click', () => changeWeek(1));
     
-    document.getElementById('prev-day').addEventListener('click', () => changeDay(-1));
-    document.getElementById('next-day').addEventListener('click', () => changeDay(1));
+    const prevDayBtn = document.getElementById('prev-day');
+    const nextDayBtn = document.getElementById('next-day');
+    if (prevDayBtn) prevDayBtn.addEventListener('click', () => changeDay(-1));
+    if (nextDayBtn) nextDayBtn.addEventListener('click', () => changeDay(1));
     
-    document.getElementById('prev-year').addEventListener('click', () => changeYear(-1));
-    document.getElementById('next-year').addEventListener('click', () => changeYear(1));
+    const prevYearBtn = document.getElementById('prev-year');
+    const nextYearBtn = document.getElementById('next-year');
+    if (prevYearBtn) prevYearBtn.addEventListener('click', () => changeYear(-1));
+    if (nextYearBtn) nextYearBtn.addEventListener('click', () => changeYear(1));
     
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {

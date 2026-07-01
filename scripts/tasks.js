@@ -1,10 +1,14 @@
 let currentViewDate = new Date();
 
 function renderMonthView() {
+    const monthTitle = document.getElementById('month-title');
+    const monthGrid = document.getElementById('month-grid');
+    if (!monthTitle || !monthGrid) return;
+    
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     
-    document.getElementById('month-title').textContent = `${year}年${month + 1}月`;
+    monthTitle.textContent = `${year}年${month + 1}月`;
     
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -34,10 +38,14 @@ function renderMonthView() {
         `;
     }
     
-    document.getElementById('month-grid').innerHTML = html;
+    monthGrid.innerHTML = html;
 }
 
 function renderWeekView() {
+    const weekTitle = document.getElementById('week-title');
+    const weekViewContainer = document.getElementById('week-view-container');
+    if (!weekTitle || !weekViewContainer) return;
+    
     const year = currentViewDate.getFullYear();
     const month = currentViewDate.getMonth();
     const date = currentViewDate.getDate();
@@ -53,7 +61,7 @@ function renderWeekView() {
     
     const startDateStr = formatDate(days[0]);
     const endDateStr = formatDate(days[6]);
-    document.getElementById('week-title').textContent = `${startDateStr} - ${endDateStr}`;
+    weekTitle.textContent = `${startDateStr} - ${endDateStr}`;
     
     const tasks = Storage.tasks.getAll();
     const today = new Date().toISOString().split('T')[0];
@@ -82,7 +90,7 @@ function renderWeekView() {
     });
     
     html += '</div>';
-    document.getElementById('week-view-container').innerHTML = html;
+    weekViewContainer.innerHTML = html;
 }
 
 function generateTimeSlots(startHour, endHour, slotMinutes) {
@@ -114,10 +122,14 @@ function generateWeekDaySlots(dateStr, tasks) {
 }
 
 function renderDayView(dateStr = null) {
+    const dayTitle = document.getElementById('day-title');
+    const dayViewContainer = document.getElementById('day-view-container');
+    if (!dayTitle || !dayViewContainer) return;
+    
     const date = dateStr ? new Date(dateStr) : currentViewDate;
     const displayDate = formatDate(date);
     
-    document.getElementById('day-title').textContent = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    dayTitle.textContent = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
     
     const tasks = Storage.tasks.getAll();
     const dayTasks = tasks.filter(t => t.date === displayDate);
@@ -133,7 +145,7 @@ function renderDayView(dateStr = null) {
         </div>
     `;
     
-    document.getElementById('day-view-container').innerHTML = html;
+    dayViewContainer.innerHTML = html;
 }
 
 function generateDayTimeSlots() {
@@ -170,8 +182,12 @@ function generateDayTaskSlots(dateStr, tasks) {
 }
 
 function renderYearView() {
+    const yearTitle = document.getElementById('year-title');
+    const yearHeatmap = document.getElementById('year-heatmap');
+    if (!yearTitle || !yearHeatmap) return;
+    
     const year = currentViewDate.getFullYear();
-    document.getElementById('year-title').textContent = `${year}年`;
+    yearTitle.textContent = `${year}年`;
     
     const tasks = Storage.tasks.getAll();
     const taskCountByDate = {};
@@ -203,7 +219,7 @@ function renderYearView() {
         currentDate.setDate(currentDate.getDate() + 1);
     }
     
-    document.getElementById('year-heatmap').innerHTML = html;
+    yearHeatmap.innerHTML = html;
 }
 
 function renderScheduleList(tasks = null) {
@@ -814,11 +830,15 @@ function goToDayView(dateStr) {
 }
 
 function switchTab(tabName) {
+    const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    const tabContent = document.getElementById(`tab-${tabName}`);
+    if (!tabBtn || !tabContent) return;
+    
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    document.querySelector(`.tab-btn[data-tab="${tabName}"]`).classList.add('active');
-    document.getElementById(`tab-${tabName}`).classList.add('active');
+    tabBtn.classList.add('active');
+    tabContent.classList.add('active');
     
     if (tabName === 'month') renderMonthView();
     if (tabName === 'week') renderWeekView();
@@ -1209,10 +1229,6 @@ function refreshAllViews() {
     renderHomeMonthCalendar();
     renderHomeYearCalendar();
     renderWeekProgress();
-    renderMonthView();
-    renderWeekView();
-    renderDayView();
-    renderYearView();
     renderScheduleList();
     renderProjectView();
     renderArchive();
