@@ -17,6 +17,9 @@ function switchView(viewName) {
     const banner = document.getElementById('reminder-banner');
     if (banner) banner.style.display = 'none';
     
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.classList.remove('show');
+    
     if (viewName === 'home') {
         renderTodayFocus();
         renderWeekCalendar();
@@ -48,6 +51,27 @@ function initNavigation() {
         menuToggle.addEventListener('click', () => {
             sidebar.classList.toggle('show');
         });
+    }
+    
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        mainContent.addEventListener('touchmove', (e) => {
+            const touchEndX = e.touches[0].clientX;
+            const touchEndY = e.touches[0].clientY;
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX > 80 && touchStartX < 50) {
+                if (sidebar) sidebar.classList.remove('show');
+            }
+        }, { passive: true });
     }
     
     const modalOverlay = document.getElementById('modal-overlay');
