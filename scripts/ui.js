@@ -1,14 +1,21 @@
 function closeModal() {
-    document.getElementById('modal-overlay').classList.remove('show');
-    document.getElementById('modal-body').innerHTML = '';
+    const overlay = document.getElementById('modal-overlay');
+    const body = document.getElementById('modal-body');
+    if (overlay) overlay.classList.remove('show');
+    if (body) body.innerHTML = '';
 }
 
 function switchView(viewName) {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
     
-    document.querySelector(`.nav-btn[data-view="${viewName}"]`).classList.add('active');
-    document.getElementById(`view-${viewName}`).classList.add('active');
+    const navBtn = document.querySelector(`.nav-btn[data-view="${viewName}"]`);
+    const viewPanel = document.getElementById(`view-${viewName}`);
+    if (navBtn) navBtn.classList.add('active');
+    if (viewPanel) viewPanel.classList.add('active');
+    
+    const banner = document.getElementById('reminder-banner');
+    if (banner) banner.style.display = 'none';
     
     if (viewName === 'home') {
         renderTodayFocus();
@@ -35,15 +42,22 @@ function initNavigation() {
         });
     });
     
-    document.getElementById('menu-toggle').addEventListener('click', () => {
-        document.getElementById('sidebar').classList.toggle('show');
-    });
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+        });
+    }
     
-    document.getElementById('modal-overlay').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('modal-overlay')) {
-            closeModal();
-        }
-    });
+    const modalOverlay = document.getElementById('modal-overlay');
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
     
     const prevMonthBtn = document.getElementById('prev-month');
     const nextMonthBtn = document.getElementById('next-month');

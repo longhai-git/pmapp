@@ -12,8 +12,8 @@ const SUPABASE_CONFIG = {
 
 function initSupabase() {
     try {
-        if (window.Supabase && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
-            window.pmappSupabase = window.Supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        if (window.supabase && window.supabase.createClient && SUPABASE_CONFIG.url && SUPABASE_CONFIG.anonKey) {
+            window.pmappSupabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             return true;
         }
     } catch (e) {
