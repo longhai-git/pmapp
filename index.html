@@ -306,6 +306,20 @@
                 <h2 class="section-title">设置</h2>
                 <div class="settings-container">
                     <div class="settings-section">
+                        <h3>账号同步</h3>
+                        <div id="auth-status">未登录</div>
+                        <div id="auth-form" class="auth-form">
+                            <input type="email" id="auth-email" placeholder="邮箱" class="form-input">
+                            <input type="password" id="auth-password" placeholder="密码" class="form-input">
+                            <div class="auth-buttons">
+                                <button class="btn-primary" onclick="handleSignUp()">注册</button>
+                                <button class="btn-secondary" onclick="handleSignIn()">登录</button>
+                            </div>
+                        </div>
+                        <button class="btn-danger" id="signout-btn" onclick="handleSignOut()" style="display:none;">退出登录</button>
+                        <button class="btn-secondary" id="sync-btn" onclick="handleSync()" style="display:none;">手动同步</button>
+                    </div>
+                    <div class="settings-section">
                         <h3>数据管理</h3>
                         <button class="btn-primary" onclick="exportData()">导出数据</button>
                         <label class="file-upload-label">

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     initSupabase();
     closeModal();
     Storage.initSampleData();
@@ -9,6 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
     setInterval(updateDate, 60000);
     setInterval(checkOverdueTasks, 60000);
+    setInterval(async () => {
+        const user = await getCurrentUser();
+        if (user) {
+            await Storage.syncAll();
+            refreshAllViews();
+        }
+    }, 300000);
     
     initNavigation();
     initTaskForm();
@@ -28,6 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
     checkOverdueTasks();
     
     switchView('home');
+    
+    const user = await getCurrentUser();
+    if (user) {
+        await Storage.syncAll();
+        refreshAllViews();
+    }
 });
 
 function initHomeViewSelector() {

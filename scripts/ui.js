@@ -216,3 +216,88 @@ function toggleTaskPriority(taskId) {
         refreshAllViews();
     }
 }
+
+async function checkAuthStatus() {
+    const user = await getCurrentUser();
+    const statusEl = document.getElementById('auth-status');
+    const formEl = document.getElementById('auth-form');
+    const signoutBtn = document.getElementById('signout-btn');
+    const syncBtn = document.getElementById('sync-btn');
+    
+    if (statusEl) {
+        statusEl.textContent = user ? `已登录：${user.email}` : '未登录';
+    }
+    if (formEl) {
+        formEl.style.display = user ? 'none' : 'block';
+    }
+    if (signoutBtn) {
+        signoutBtn.style.display = user ? 'block' : 'none';
+    }
+    if (syncBtn) {
+        syncBtn.style.display = user ? 'block' : 'none';
+    }
+    
+    return !!user;
+}
+
+async function handleSignIn() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    
+    if (!email || !password) {
+        alert('请输入邮箱和密码');
+        return;
+    }
+    
+    try {
+        await signIn(email, password);
+        alert('登录成功！');
+        await checkAuthStatus();
+        await Storage.syncAll();
+        refreshAllViews();
+    } catch (error) {
+        alert('登录失败：' + error.message);
+    }
+}
+
+async function handleSignUp() {
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    
+    if (!email || !password) {
+        alert('请输入邮箱和密码');
+        return;
+    }
+    
+    if (password.length < 6) {
+        alert('密码长度至少为6位');
+        return;
+    }
+    
+    try {
+        await signUp(email, password);
+        alert('注册成功！请登录');
+    } catch (error) {
+        alert('注册失败：' + error.message);
+    }
+}
+
+async function handleSignOut() {
+    try {
+        await signOut();
+        alert('已退出登录');
+        await checkAuthStatus();
+    } catch (error) {
+        alert('退出失败：' + error.message);
+    }
+}
+
+async function handleSync() {
+    try {
+        await Storage.syncAll();
+        alert('同步完成！');
+        refreshAllViews();
+    } catch (error) {
+        alert('同步失败：' + error.message);
+    }
+}
