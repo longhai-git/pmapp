@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     switchView('home');
     
+    await checkAuthStatus();
+    
     const user = await getCurrentUser();
     if (user) {
         await Storage.syncAll();

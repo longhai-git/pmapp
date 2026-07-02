@@ -217,55 +217,55 @@ function toggleTaskPriority(taskId) {
     }
 }
 
-async function checkAuthStatus() {
-    const user = await getCurrentUser();
-    const statusEl = document.getElementById('auth-status');
-    const formEl = document.getElementById('auth-form');
-    const signoutBtn = document.getElementById('signout-btn');
-    const syncBtn = document.getElementById('sync-btn');
+let currentAvatar = '👤';
+
+function showAuthModal() {
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
     
-    if (statusEl) {
-        statusEl.textContent = user ? `已登录：${user.email}` : '未登录';
-    }
-    if (formEl) {
-        formEl.style.display = user ? 'none' : 'block';
-    }
-    if (signoutBtn) {
-        signoutBtn.style.display = user ? 'block' : 'none';
-    }
-    if (syncBtn) {
-        syncBtn.style.display = user ? 'block' : 'none';
+    if (modalTitle) modalTitle.textContent = '登录/注册';
+    if (modalBody) {
+        modalBody.innerHTML = `
+            <div class="auth-modal">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+                    <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+                </div>
+                <div class="auth-form-content" id="auth-form-content">
+                    <input type="tel" id="auth-phone" placeholder="手机号" class="form-input" maxlength="11">
+                    <input type="password" id="auth-password" placeholder="密码" class="form-input">
+                </div>
+                <button class="btn-primary" onclick="handleAuthSubmit()" id="auth-submit-btn">登录</button>
+            </div>
+        `;
     }
     
-    return !!user;
+    const overlay = document.getElementById('modal-overlay');
+    const modal = document.getElementById('modal');
+    if (overlay) overlay.classList.add('show');
+    if (modal) modal.classList.add('show');
 }
 
-async function handleSignIn() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
+function switchAuthTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
     
-    if (!email || !password) {
-        alert('请输入邮箱和密码');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    if (submitBtn) submitBtn.textContent = tab === 'login' ? '登录' : '注册';
+}
+
+async function handleAuthSubmit() {
+    const phone = document.getElementById('auth-phone').value;
+    const password = document.getElementById('auth-password').value;
+    const submitBtn = document.getElementById('auth-submit-btn');
+    
+    if (!phone || !password) {
+        alert('请输入手机号和密码');
         return;
     }
     
-    try {
-        await signIn(email, password);
-        alert('登录成功！');
-        await checkAuthStatus();
-        await Storage.syncAll();
-        refreshAllViews();
-    } catch (error) {
-        alert('登录失败：' + error.message);
-    }
-}
-
-async function handleSignUp() {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    
-    if (!email || !password) {
-        alert('请输入邮箱和密码');
+    if (!/^1[3-9]\d{9}$/.test(phone)) {
+        alert('请输入有效的手机号');
         return;
     }
     
@@ -274,17 +274,90 @@ async function handleSignUp() {
         return;
     }
     
+    const email = `${phone}@pmapp.local`;
+    
     try {
-        await signUp(email, password);
-        alert('注册成功！请登录');
+        if (submitBtn.textContent === '登录') {
+            await signIn(email, password);
+            alert('登录成功！');
+        } else {
+            await signUp(email, password);
+            alert('注册成功！请登录');
+            return;
+        }
+        
+        closeModal();
+        await checkAuthStatus();
+        await Storage.syncAll();
+        refreshAllViews();
     } catch (error) {
-        alert('注册失败：' + error.message);
+        alert('操作失败：' + error.message);
     }
+}
+
+async function checkAuthStatus() {
+    const user = await getCurrentUser();
+    const userNameEl = document.getElementById('user-name');
+    const avatarBtn = document.getElementById('user-avatar-btn');
+    const settingsAuthStatus = document.getElementById('settings-auth-status');
+    const settingsAuthBtn = document.getElementById('settings-auth-btn');
+    const profileSettings = document.getElementById('profile-settings');
+    const settingsSyncBtn = document.getElementById('settings-sync-btn');
+    const profileNameInput = document.getElementById('profile-name');
+    
+    if (user) {
+        const profile = getStoredProfile();
+        if (userNameEl) userNameEl.textContent = profile.name || user.email.split('@')[0];
+        if (avatarBtn) avatarBtn.textContent = profile.avatar || '👤';
+        currentAvatar = profile.avatar || '👤';
+        if (settingsAuthStatus) settingsAuthStatus.textContent = '已登录';
+        if (settingsAuthBtn) settingsAuthBtn.style.display = 'none';
+        if (profileSettings) profileSettings.style.display = 'block';
+        if (settingsSyncBtn) settingsSyncBtn.style.display = 'block';
+        if (profileNameInput) profileNameInput.value = profile.name || '';
+    } else {
+        if (userNameEl) userNameEl.textContent = '';
+        if (avatarBtn) avatarBtn.textContent = '👤';
+        currentAvatar = '👤';
+        if (settingsAuthStatus) settingsAuthStatus.textContent = '未登录';
+        if (settingsAuthBtn) settingsAuthBtn.style.display = 'block';
+        if (profileSettings) profileSettings.style.display = 'none';
+        if (settingsSyncBtn) settingsSyncBtn.style.display = 'none';
+    }
+    
+    return !!user;
+}
+
+function getStoredProfile() {
+    const profile = localStorage.getItem('pmapp_profile');
+    return profile ? JSON.parse(profile) : { name: '', avatar: '👤' };
+}
+
+function selectAvatar(avatar) {
+    currentAvatar = avatar;
+    document.querySelectorAll('.avatar-option').forEach(opt => {
+        opt.style.border = opt.textContent === avatar ? '2px solid var(--primary-color)' : '2px solid transparent';
+    });
+}
+
+async function saveProfile() {
+    const name = document.getElementById('profile-name').value;
+    
+    const profile = {
+        name: name,
+        avatar: currentAvatar
+    };
+    
+    localStorage.setItem('pmapp_profile', JSON.stringify(profile));
+    
+    await checkAuthStatus();
+    alert('个人信息保存成功！');
 }
 
 async function handleSignOut() {
     try {
         await signOut();
+        localStorage.removeItem('pmapp_profile');
         alert('已退出登录');
         await checkAuthStatus();
     } catch (error) {

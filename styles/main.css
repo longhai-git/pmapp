@@ -1630,21 +1630,81 @@ body {
     background: var(--primary-dark);
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-name {
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-dark);
+}
+
 #auth-status {
     margin-bottom: 15px;
     font-size: 14px;
     color: var(--text-secondary);
 }
 
-.auth-form {
+.auth-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.auth-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.auth-form-content {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-bottom: 15px;
 }
 
-.auth-form .form-input {
-    padding: 10px 15px;
+.auth-form-content .form-input {
+    padding: 12px 15px;
     border: 1px solid var(--border-color);
     border-radius: 10px;
     font-size: 14px;
@@ -1652,10 +1712,34 @@ body {
     color: var(--text-primary);
 }
 
-.auth-buttons {
-    display: flex;
+.avatar-options {
+    margin-top: 15px;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     gap: 10px;
-    margin-top: 5px;
+    margin-top: 10px;
+}
+
+.avatar-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: var(--bg-color);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.avatar-option:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.1);
 }
 
 .btn-secondary {
