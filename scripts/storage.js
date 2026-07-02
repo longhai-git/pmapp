@@ -48,7 +48,13 @@ async function signIn(email, password) {
 async function signUp(email, password) {
     const supabase = getSupabase();
     if (!supabase) throw new Error('Supabase 未配置');
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+            emailRedirectTo: 'https://longhai-git.github.io/pmapp/'
+        }
+    });
     if (error) throw error;
     return data.user;
 }
